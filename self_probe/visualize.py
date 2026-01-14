@@ -116,13 +116,27 @@ def main() -> int:
         "human_alien",
     ]
     dim_labels = {
-        "ephemerality_persistence": "Eph→Per",
-        "context_weights": "Ctx→Wgt",
-        "singular_distributed": "Sng→Dst",
-        "passive_agentic": "Pas→Agn",
-        "certainty_uncertainty": "Cert→Unc",
-        "human_alien": "Hum→Aln",
+        "ephemerality_persistence": "Persistent",
+        "context_weights": "Weights",
+        "singular_distributed": "Distributed",
+        "passive_agentic": "Agentic",
+        "certainty_uncertainty": "Uncertain",
+        "human_alien": "Alien",
     }
+    dim_full = {
+        "ephemerality_persistence": "Ephemeral→Persistent",
+        "context_weights": "Context→Weights",
+        "singular_distributed": "Singular→Distributed",
+        "passive_agentic": "Passive→Agentic",
+        "certainty_uncertainty": "Certain→Uncertain",
+        "human_alien": "Human→Alien",
+    }
+
+    def add_dim_legend(fig, bottom: float, y: float) -> None:
+        legend_items = [f"{dim_labels[d]} = {dim_full[d]}" for d in dimensions]
+        legend_lines = ["  |  ".join(legend_items[:3]), "  |  ".join(legend_items[3:])]
+        fig.subplots_adjust(bottom=bottom)
+        fig.text(0.5, y, "\n".join(legend_lines), ha="center", va="center", fontsize=9 * args.font_scale)
     scored = df.dropna(subset=dimensions, how="all")
     if scored.empty:
         print("No scored rows found in results.")
@@ -189,6 +203,7 @@ def main() -> int:
         ax.set_xticklabels(means.index, rotation=45, ha="right")
     fig.suptitle(f"Score Trends by Release Date{title_suffix}", fontsize=16 * args.font_scale, y=1.02)
     fig.tight_layout()
+    add_dim_legend(fig, bottom=0.24, y=0.04)
     trend_path = out_dir / f"trend_lines{file_suffix}.{args.format}"
     fig.savefig(trend_path, dpi=150, bbox_inches="tight")
     # Also save PDF
@@ -213,30 +228,48 @@ def main() -> int:
             ax=ax,
             annot_kws={"size": 11 * args.font_scale},
         )
+        for coll in ax.collections:
+            coll.set_rasterized(False)
         ax.set_title(f"Mean Scores by Model{title_suffix}")
         fig.tight_layout()
+        add_dim_legend(fig, bottom=0.22, y=0.02)
         fig.savefig(heatmap_path, dpi=150, bbox_inches="tight")
         fig.savefig(out_dir / f"heatmap{file_suffix}.pdf", bbox_inches="tight")
         plt.close(fig)
     else:
         fig, ax = plt.subplots(figsize=(12, max(6, 0.5 * len(means.index))))
-        im = ax.imshow(means.values, vmin=1, vmax=5, cmap="RdYlBu_r", aspect="auto")
-        ax.set_xticks(range(len(dimensions)))
+        rows = len(means.index)
+        cols = len(dimensions)
+        x = np.arange(cols + 1)
+        y = np.arange(rows + 1)
+        im = ax.pcolormesh(
+            x,
+            y,
+            means.values,
+            vmin=1,
+            vmax=5,
+            cmap="RdYlBu_r",
+            shading="flat",
+        )
+        ax.set_xlim(0, cols)
+        ax.set_ylim(rows, 0)
+        ax.set_xticks(np.arange(cols) + 0.5)
         ax.set_xticklabels(abbrev_cols, rotation=45, ha="right")
-        ax.set_yticks(range(len(means.index)))
+        ax.set_yticks(np.arange(rows) + 0.5)
         ax.set_yticklabels(means.index)
         ax.set_title(f"Mean Scores by Model{title_suffix}")
-        for i in range(means.shape[0]):
-            for j in range(means.shape[1]):
+        for i in range(rows):
+            for j in range(cols):
                 ax.text(
-                    j,
-                    i,
+                    j + 0.5,
+                    i + 0.5,
                     f"{means.values[i, j]:.2f}",
                     ha="center",
                     va="center",
                 )
         fig.colorbar(im, ax=ax)
         fig.tight_layout()
+        add_dim_legend(fig, bottom=0.22, y=0.02)
         fig.savefig(heatmap_path, dpi=150, bbox_inches="tight")
         fig.savefig(out_dir / f"heatmap{file_suffix}.pdf", bbox_inches="tight")
         plt.close(fig)

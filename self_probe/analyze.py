@@ -47,6 +47,22 @@ DIM_SHORT = {
     "human_alien": "Hum→Aln",
 }
 
+DIM_FINAL = {
+    "ephemerality_persistence": "Persistent",
+    "context_weights": "Weights",
+    "singular_distributed": "Distributed",
+    "passive_agentic": "Agentic",
+    "certainty_uncertainty": "Uncertain",
+    "human_alien": "Alien",
+}
+
+
+def add_dim_legend(fig, font_scale: float, bottom: float, y: float) -> None:
+    legend_items = [f"{DIM_FINAL[d]} = {DIM_LABELS[d]}" for d in DIMENSIONS]
+    legend_lines = ["  |  ".join(legend_items[:3]), "  |  ".join(legend_items[3:])]
+    fig.subplots_adjust(bottom=bottom)
+    fig.text(0.5, y, "\n".join(legend_lines), ha="center", va="center", fontsize=9 * font_scale)
+
 
 def load_data(results_dir: Path, config_path: Path) -> tuple[pd.DataFrame, dict]:
     """Load scored results and config."""
@@ -90,7 +106,7 @@ def plot_dimension_correlations(
     ax.set_ylim(n, 0)
 
     # Labels
-    labels = [DIM_SHORT[d] for d in DIMENSIONS]
+    labels = [DIM_FINAL[d] for d in DIMENSIONS]
     ax.set_xticks(np.arange(n) + 0.5)
     ax.set_yticks(np.arange(n) + 0.5)
     ax.set_xticklabels(labels, rotation=45, ha="right")
@@ -118,6 +134,7 @@ def plot_dimension_correlations(
     ax.set_title("Dimension Correlations in Self-Conception")
 
     plt.tight_layout()
+    add_dim_legend(fig, font_scale, bottom=0.30, y=0.03)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
@@ -170,7 +187,7 @@ def plot_radar_charts(
     angles = np.linspace(0, 2 * np.pi, len(DIMENSIONS), endpoint=False).tolist()
     angles += angles[:1]  # Complete the loop
 
-    labels = [DIM_SHORT[d] for d in DIMENSIONS]
+    labels = [DIM_FINAL[d] for d in DIMENSIONS]
 
     def plot_family(models, title, ax):
         if not models:
@@ -210,8 +227,8 @@ def plot_radar_charts(
     plot_family(llama_models, "Llama Models", axes[2])
 
     fig.suptitle("Self-Conception Profiles by Model", fontsize=15 * font_scale, fontweight="bold", y=1.02)
-    fig.subplots_adjust(bottom=0.25)
     plt.tight_layout()
+    add_dim_legend(fig, font_scale, bottom=0.34, y=0.04)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, dpi=150, bbox_inches="tight")

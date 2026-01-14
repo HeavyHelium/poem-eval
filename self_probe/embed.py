@@ -473,10 +473,7 @@ def plot_embeddings(
             ncol=1,
             handler_map={tuple: HandlerOverlay()},
         )
-        title = (
-            f"Poem Embeddings by Model ({method.upper()})"
-            " — family palettes encode release tier (older->newer)"
-        )
+        title = f"Poem Embeddings by Model ({method.upper()})"
 
     elif color_by.startswith("score:"):
         # Color by a specific score dimension
