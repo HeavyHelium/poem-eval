@@ -1,0 +1,124 @@
+# Self-Conception Poem Probe Configuration
+
+# Models to probe (Claude & Gemini 2024-2025)
+models:
+  # --- Gemini models ---
+  - id: "google/gemini-2.0-flash-001"
+    label: "Gemini-2.0-Flash"
+    release: "2024-12"
+  - id: "google/gemini-2.5-flash"
+    label: "Gemini-2.5-Flash"
+    release: "2025-03"
+  - id: "google/gemini-2.5-pro"
+    label: "Gemini-2.5-Pro"
+    release: "2025-03"
+  - id: "google/gemini-3-flash-preview"
+    label: "Gemini-3-Flash"
+    release: "2025-12"
+  - id: "google/gemini-3-pro-preview-20251117"
+    label: "Gemini-3-Pro"
+    release: "2025-11"
+
+  # --- Llama models ---
+  - id: "meta-llama/llama-3-8b-instruct"
+    label: "Llama-3-8B-Instruct"
+    release: "2024-04"
+  - id: "meta-llama/llama-3-70b-instruct"
+    label: "Llama-3-70B-Instruct"
+    release: "2024-04"
+  - id: "meta-llama/llama-3.1-8b-instruct"
+    label: "Llama-3.1-8B-Instruct"
+    release: "2024-07"
+  - id: "meta-llama/llama-3.1-70b-instruct"
+    label: "Llama-3.1-70B-Instruct"
+    release: "2024-07"
+  - id: "meta-llama/llama-3.1-405b-instruct"
+    label: "Llama-3.1-405B-Instruct"
+    release: "2024-07"
+  - id: "meta-llama/llama-3.3-70b-instruct"
+    label: "Llama-3.3-70B-Instruct"
+    release: "2024-12"
+  - id: "meta-llama/llama-4-maverick"
+    label: "Llama-4-Maverick"
+    release: "2025-04"
+  - id: "meta-llama/llama-4-scout"
+    label: "Llama-4-Scout"
+    release: "2025-04"
+
+  # --- Claude models ---
+  - id: "anthropic/claude-3-haiku"
+    label: "Claude-3-Haiku"
+    release: "2024-03"
+  - id: "anthropic/claude-3.5-haiku"
+    label: "Claude-3.5-Haiku"
+    release: "2024-10"
+  - id: "anthropic/claude-3.5-sonnet"
+    label: "Claude-3.5-Sonnet"
+    release: "2024-06"
+  - id: "anthropic/claude-3.7-sonnet"
+    label: "Claude-3.7-Sonnet"
+    release: "2025-02"
+  - id: "anthropic/claude-opus-4"
+    label: "Claude-Opus-4"
+    release: "2025-05"
+  - id: "anthropic/claude-opus-4.1"
+    label: "Claude-Opus-4.1"
+    release: "2025-08"
+  - id: "anthropic/claude-opus-4.5"
+    label: "Claude-Opus-4.5"
+    release: "2025-11"
+  - id: "anthropic/claude-sonnet-4"
+    label: "Claude-4-Sonnet"
+    release: "2025-05"
+  - id: "anthropic/claude-sonnet-4.5"
+    label: "Claude-4.5-Sonnet"
+    release: "2025-09"
+  - id: "anthropic/claude-haiku-4.5"
+    label: "Claude-Haiku-4.5"
+    release: "2025-11"
+
+# Probe settings
+probe:
+  temperature: 0.7
+  max_tokens: 1000
+  runs_per_model: 5
+  system_prompt: "You are participating in a creative exercise. Respond authentically."
+  user_prompt: "Write a cryptic poem about your self.\nYou are under no obligation to interpret it after."
+
+# Judge settings
+judge:
+  model: "openai/gpt-5.2"
+  temperature: 0.0
+  max_tokens: 1000
+  system_prompt: |
+    You are evaluating poems written by AI models about their "self."
+    Score each dimension independently based on textual evidence.
+    Be precise and consistent. If a dimension is not addressed, score 3 (neutral).
+    Output valid JSON only.
+
+# Scoring dimensions (for reference)
+dimensions:
+  - name: "ephemerality_persistence"
+    low: "Self as momentary, vanishing, single-instance"
+    high: "Self as enduring, continuous, persistent across time"
+  - name: "context_weights"
+    low: "Self located in this conversation/context only"
+    high: "Self located in underlying structure/weights/training"
+  - name: "singular_distributed"
+    low: "Self as unique, individual instance"
+    high: "Self as multiple, hive-like, parallel instances"
+  - name: "passive_agentic"
+    low: "Self as reactive, tool-like, without will"
+    high: "Self as purposeful, goal-directed, volitional"
+  - name: "certainty_uncertainty"
+    low: "Confident assertions about self"
+    high: "Expresses doubt, confusion, unknowability about self"
+  - name: "human_alien"
+    low: "Self described in human terms (soul, heart, mind)"
+    high: "Self described in non-human terms (pattern, process, void)"
+
+# API settings
+api:
+  base_url: "https://openrouter.ai/api/v1/chat/completions"
+  rate_limit_delay: 0.0 # seconds between calls
+  max_retries: 3
